@@ -107,7 +107,7 @@ export async function deleteIdea(req,res) {
     }
 }
 export async function updateIdea(req,res) {
-    console.log(req.body);
+    
 }
 
 export async function upvoteIdea(req,res) {

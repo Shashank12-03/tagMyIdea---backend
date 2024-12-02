@@ -17,6 +17,8 @@
     "nodemon": "^3.1.7",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "tagmyidea": "file:"
+    "tagmyidea": "file:",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   }
 }

@@ -7,6 +7,7 @@ import './config/auth.js';
 import dotenv from 'dotenv';
 import { checkAuthentication } from "./middleware/auth.js";
 import { ideaRouter } from "./routes/ideaRoute.js";
+import { errorLogRequests, logRequests } from "./middleware/log.js";
 
 dotenv.config();
 
@@ -21,9 +22,11 @@ const app = express();
 
 
 // middleware
+
 app.use(express.json());
 app.use(passport.initialize());
-// app.use(checkAuthentication);
+app.use(logRequests);
+app.use(errorLogRequests);
 
 // routes
 
