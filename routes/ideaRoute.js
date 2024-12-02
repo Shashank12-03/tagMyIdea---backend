@@ -4,7 +4,7 @@ import { createIdea,updateIdea,deleteIdea,searchIdea,upvoteIdea,downvoteIdea} fr
 export const ideaRouter = express.Router();
 
 ideaRouter.post('/create',createIdea);
-ideaRouter.post('/update',updateIdea);
+ideaRouter.post('/update/:id',updateIdea);
 ideaRouter.delete('/delete',deleteIdea);
 ideaRouter.get('/search/',searchIdea);
 ideaRouter.post('/upvote',upvoteIdea);

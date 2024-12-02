@@ -107,7 +107,41 @@ export async function deleteIdea(req,res) {
     }
 }
 export async function updateIdea(req,res) {
+
+    const fields = req.body;
+    const para = req.params;
+    const allowedFields = ['title','description','tags','techStack','howToBuild'];
     
+    const validators = Object.keys(fields).every((field)=>allowedFields.includes(field));
+    if (!validators) {
+        return res.status(403).json({'message':'Invalid field(s) in the request.'})
+    }
+    try {
+        const user = await req.user;
+        const userId = user.id;
+        const author = await User.findById(userId).populate('ideasPosted');
+        
+        if (!author) {
+            return res.status(400).json({'message':'user not found'});
+        }
+        
+        const ideaExists = author.ideasPosted.some(
+            (idea)=> idea._id.toString()===para.id
+        );
+        if (!ideaExists) {
+            return res.status(400).json({'message':'idea is not posted by logged in user'});
+        }
+        
+        const idea = await Ideas.findByIdAndUpdate(para.id,{$set:fields},{new:true,runValidators:true});
+        if (!idea) {
+            return res.status(400).json({'message':'cannot delete the idea it doesnt exist'});
+        }
+        return res.status(200).json({'idea':idea});
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({'message':'something went wrong!!!!'});
+    }
 }
 
 export async function upvoteIdea(req,res) {
@@ -139,7 +173,7 @@ async function vote(ideaId,opr,res) {
         if (!idea) {
             return res.status(404).json({'message':'idea not found'});
         }
-
+        
         return res.status(200).json({'idea':idea});
     } catch (error) {
         console.log(error);
