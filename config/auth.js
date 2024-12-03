@@ -11,7 +11,7 @@ const clientSecret=process.env.client_secret;
 passport.use(new GoogleStrategy({
     clientID:clientID,
     clientSecret:clientSecret,
-    callbackURL:'http://localhost:5000/auth/google/callback'
+    callbackURL:'https://tag-my-idea.vercel.app/auth/google/callback'
     },
     async (accessToken,refreshTokenn,profile,done) => {
         try {
