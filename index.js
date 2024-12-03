@@ -42,4 +42,3 @@ app.use('/idea',checkAuthentication,ideaRouter);
 app.listen(PORT,()=>console.log(`Server running on port:${PORT}`));
 
 
-export {app};
