@@ -3,13 +3,24 @@ import passport from "passport";
 
 export const userSignInRouter = express.Router();
 
-userSignInRouter.get('/google',passport.authenticate('google',{scope:['profile','email']}));
-
-userSignInRouter.get('/google/callback',
-    passport.authenticate('google',{session:false}),
-    (req,res)=>{
-        res.json({token:req.user.token});
+userSignInRouter.get('/google', 
+    (req, res, next) => {
+      passport.authenticate('google', {
+        scope: ['profile', 'email']
+      })(req, res, next);
     }
-);
-
+  );
+  
+  userSignInRouter.get('/google/callback', 
+    (req, res, next) => {
+      passport.authenticate('google', {
+        session: false,
+        failureRedirect: '/login'
+      })(req, res, next);
+    },
+    (req, res) => {
+      // Handle successful authentication
+      res.redirect('/dashboard');
+    }
+  );
 

@@ -11,8 +11,8 @@ import { errorLogRequests, logRequests } from "./middleware/log.js";
 
 dotenv.config();
 
-
-connect("mongodb://127.0.0.1:27017/tagMyIdea")
+const url = process.env.MONGO_URL;
+connect(url)
 .then(()=>console.log("mongodb connected"))
 .catch((err)=> console.log("error occured: \n",err));
 
@@ -40,3 +40,6 @@ app.use('/idea',checkAuthentication,ideaRouter);
 
 
 app.listen(PORT,()=>console.log(`Server running on port:${PORT}`));
+
+
+export {app};
