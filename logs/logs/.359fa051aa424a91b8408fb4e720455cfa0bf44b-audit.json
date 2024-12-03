@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\.359fa051aa424a91b8408fb4e720455cfa0bf44b-audit.json",
+    "files": [
+        {
+            "date": 1733146057027,
+            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2024-12-02-combined.log",
+            "hash": "d103feea56689874bb805b3fd031b8516d7cc187fabde1716ac434660de07763"
+        },
+        {
+            "date": 1733233670666,
+            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2024-12-03-combined.log",
+            "hash": "6f04399c657b536fc4c16aa4fa4d07f4660cba228bd07936e94b140354d49c9f"
+        }
+    ],
+    "hashType": "sha256"
+}
