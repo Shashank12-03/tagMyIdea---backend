@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { checkAuthentication } from "./middleware/auth.js";
 import { ideaRouter } from "./routes/ideaRoute.js";
 import { errorLogRequests, logRequests } from "./middleware/log.js";
+import cors from 'cors';
 
 dotenv.config();
 
@@ -20,9 +21,15 @@ connect(url)
 const PORT = process.env.PORT;
 const app = express();
 
+const coreOption = {
+    origin:"http://localhost:3000",
+    method:["GET","POST","PATCH","DELETE","PUT"],
+    allowHeaders:["Content-Type","Authorization"],
+    credentials: true, 
+}
 
 // middleware
-
+app.use(cors(coreOption));
 app.use(express.json());
 app.use(passport.initialize());
 app.use(logRequests);

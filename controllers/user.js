@@ -75,30 +75,99 @@ export async function unfollow(req,res) {
     }
 }
 
+
+
 export async function getUser(req,res) {
-    const {userId} = req.query;
+    const {userId} = req.params;
     if (!userId) {
         return res.status(400).json({'message':'url query required'});
     }
+    const isFollow = await isFollow(userId);
+    const user = await getProfile(userId);
+    return res.status(200).json(user,isFollow);
+}
+
+export async function getLoggedInUser(req,res) {
+    const request = await req.user;
+    const requestId = request.id;
+    const user = await getProfile(requestId);
+    if (!user) {
+        return res.status(404).json({'message':'user not found'});
+    }
+    return res.status(200).json(user);
+}
+
+async function isFollow(userId) {
+    const requester = await req.user;
+    const requesterId = requester.id;
+    const user = await User.findById(requesterId);
+    const followingList = user.following; 
+    if (followingList.includes(userId)) {
+        return true;
+    }
+    return false;
+}
+
+async function getList(userId) {
+
     try {
         const user = await User.findById(userId);
-        console.log(user.bio);
+        const followList = user.followers;
+        const followingList = user.following;
+        const lists = [];
+        const followers = [];
+        const following = [];
+        for (let index = 0; index < followList.length; index++) {
+            const follower = await User.findById(followList[index]);
+            const toSend = {
+                'id':followList[index],
+                'photo':follower.photo,
+                'name': follower.username
+            };
+            followers.push(toSend);
+        }
+        for (let index = 0; index < followingList.length; index++) {
+            const following = await User.findById(followingList[index]);
+            const toSend = {
+                'photo':following.photo,
+                'id':followingList[index],
+                'name': following.username,
+            };
+            following.push(toSend);
+        }
+        lists.push(followers);
+        lists.push(following);
+        return lists;
+    } catch (error) {
+        console.log(error);
+        return undefined;
+    }
+}
+
+export async function getProfile(userId) {
+
+    try {
+        const user = await User.findById(userId);
+        const list = await getList(userId);
         const toShow = {
+            'id':userId,
             'name': user.username,
+            'photo':user.photo,
             'bio':user.bio,
+            'ideasPosted': user.ideasPosted,
             'NoOffollowers':user.followers.length,
             'NoOffollowing':user.following.length,
-            'followers':user.followers,
-            'following':user.following,
+            'followers':list[0],
+            'following':list[1],
             'dateJoined': user.dateJoined,
         };
         if (!user) {
-            return res.status(400).json({'message':'user not found'});
+            return undefined;
         }
-        return res.status(200).json({'user':toShow});
+        return toShow;
     } catch (error) {
         console.log(error);
-        return res.status(400).json({'message':'something went wrong'});
+        return undefined;
     }
 }
 
@@ -110,6 +179,7 @@ export async function updateUser(req,res) {
     }
     try {
         const getUser = await req.user;
+        console.log(getUser);
         var user;
         if (username && !bio) {
             user = await User.findByIdAndUpdate(getUser.id,{username},{new:true,runValidators:true});
@@ -120,7 +190,17 @@ export async function updateUser(req,res) {
         else {
             user = await User.findByIdAndUpdate(getUser.id,{username,bio},{new:true,runValidators:true});
         }
-        return res.status(200).json({'user':user});
+        const data = {
+            'id':user.id,
+            'name': user.username,
+            'bio':user.bio,
+            'NoOffollowers':user.followers.length,
+            'NoOffollowing':user.following.length,
+            'followers':user.followers,
+            'following':user.following,
+            'dateJoined': user.dateJoined,
+        }
+        return res.status(200).json({'user':data});
     } catch (error) {
         console.log(error);
         return res.status(400).json({'message':'something went wrong'});

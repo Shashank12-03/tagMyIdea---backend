@@ -11,7 +11,7 @@ const clientSecret=process.env.client_secret;
 passport.use(new GoogleStrategy({
     clientID:clientID,
     clientSecret:clientSecret,
-    callbackURL:'https://tag-my-idea.vercel.app/auth/google/callback'
+    callbackURL:'http://localhost:5000/auth/google/callback'
     },
     async (accessToken,refreshTokenn,profile,done) => {
         try {
@@ -22,7 +22,8 @@ passport.use(new GoogleStrategy({
                 user = new User({
                     googleId:profile.id,
                     email:profile.emails[0].value,
-                    username:profile.displayName
+                    username:profile.displayName,
+                    photo: profile.photos.value
                 });
                 await user.save();
             }

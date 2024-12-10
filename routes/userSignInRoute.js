@@ -3,6 +3,9 @@ import passport from "passport";
 
 export const userSignInRouter = express.Router();
 
+const frontend_url = "http://localhost:3000"
+
+
 userSignInRouter.get('/google', 
     (req, res, next) => {
       passport.authenticate('google', {
@@ -15,12 +18,12 @@ userSignInRouter.get('/google',
     (req, res, next) => {
       passport.authenticate('google', {
         session: false,
-        failureRedirect: '/login'
+        failureRedirect: '/google'
       })(req, res, next);
     },
     (req, res) => {
-      // Handle successful authentication
-      res.redirect('/dashboard');
+      const token = req.user.token;
+      res.redirect(`${frontend_url}/update-profile?token=${token}`);
     }
   );
 
