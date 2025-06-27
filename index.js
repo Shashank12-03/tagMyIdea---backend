@@ -22,9 +22,9 @@ const PORT = process.env.PORT;
 const app = express();
 
 const coreOption = {
-    origin:"http://localhost:3000",
+    origin:"http://localhost:5173",
     method:["GET","POST","PATCH","DELETE","PUT"],
-    allowHeaders:["Content-Type","Authorization"],
+    allowHeaders:["Content-Type","Authorization","Access-Control-Allow-Origin"],
     credentials: true, 
 }
 

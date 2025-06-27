@@ -31,7 +31,11 @@ const userSchema = new mongoose.Schema({
     ideasPosted :{
         type: [mongoose.Schema.Types.ObjectId],
         ref :'Idea'
-    }
+    },
+    links:{
+        type: [String],
+        default:[]
+    },
 },{timestamps:true});
 
 

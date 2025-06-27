@@ -3,7 +3,7 @@ import passport from "passport";
 
 export const userSignInRouter = express.Router();
 
-const frontend_url = "http://localhost:3000"
+const frontend_url = "http://localhost:5173"
 
 
 userSignInRouter.get('/google', 
@@ -23,7 +23,14 @@ userSignInRouter.get('/google',
     },
     (req, res) => {
       const token = req.user.token;
-      res.redirect(`${frontend_url}/update-profile?token=${token}`);
+      const encodedToken = encodeURIComponent(token);
+      console.log(encodedToken);
+      res.redirect(`${frontend_url}/update/profile?token=${encodedToken}`);
+      // return res.status(200).json({
+      //   message: 'Authentication successful',
+      //   token: token,
+      //   user: req.user.user
+      // });
     }
   );
 

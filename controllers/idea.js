@@ -146,7 +146,6 @@ export async function updateIdea(req,res) {
 
 export async function upvoteIdea(req,res) {
     const {ideaId} = req.body;
-
     if (!ideaId) {
         return res.status(404).json({'message':'idea id not found'});
     }

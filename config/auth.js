@@ -16,11 +16,10 @@ passport.use(new GoogleStrategy({
     async (accessToken,refreshTokenn,profile,done) => {
         try {
             console.log(profile);
-            let user = await User.findOne({googleId:profile.id});
-            console.log(user);
+            let user = await User.findOne({email:profile.emails[0].value});
+            console.log("user: ",user);
             if (!user) {
                 user = new User({
-                    googleId:profile.id,
                     email:profile.emails[0].value,
                     username:profile.displayName,
                     photo: profile.photos.value
@@ -28,7 +27,7 @@ passport.use(new GoogleStrategy({
                 await user.save();
             }
 
-            const token = jwt.sign({id:user._id,email:user.email},process.env.JWT_SECRET,{expiresIn:'7h'});
+            const token = jwt.sign({id:user._id,email:user.email},process.env.JWT_SECRET,{expiresIn:'7d'});
             console.log(token);
             done(null,{user,token});
         } catch (error) {
