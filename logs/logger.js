@@ -7,22 +7,20 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Use /tmp/logs for writable logs in serverless environments
-const logDirectory = process.env.SERVERLESS ? path.join('/tmp', 'logs') : path.join(__dirname, 'logs');
+const isServerless = process.env.GAE_ENV === 'standard' || process.env.K_SERVICE;
 
-// Ensure the directory exists
+const logDirectory = isServerless
+    ? path.join('/tmp', 'logs') 
+    : path.join(__dirname, 'logs');
+
 if (!fs.existsSync(logDirectory)) {
     fs.mkdirSync(logDirectory, { recursive: true });
 }
 
-// Configure logger
-export const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-    ),
-    transports: [
+const transports = [];
+
+try {
+    transports.push(
         new DailyRotateFile({
             filename: `${logDirectory}/%DATE%-combined.log`,
             datePattern: 'YYYY-MM-DD',
@@ -33,18 +31,27 @@ export const logger = winston.createLogger({
             datePattern: 'YYYY-MM-DD',
             level: 'error',
             maxFiles: '14d',
-        }),
-    ],
-});
-
-// Add console logging for non-production environments
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(
-        new winston.transports.Console({
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.simple()
-            ),
         })
     );
+} catch (err) {
+    console.error("Failed to initialize file logging:", err);
 }
+
+transports.push(
+    new winston.transports.Console({
+        format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+        ),
+    })
+);
+
+
+export const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports,
+});

@@ -3,8 +3,8 @@ import passport from 'passport';
 import { User } from '../models/user.js';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
-const clientID=process.env.client_id;
-const clientSecret=process.env.client_secret;
+const clientID=process.env.CLIENT_ID;
+const clientSecret=process.env.CLIENT_SECRET;
 
 // console.log(clientID, " ", clientSecret);
 
