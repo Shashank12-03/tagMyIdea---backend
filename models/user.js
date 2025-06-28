@@ -1,15 +1,13 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    googleId :{
-        type: String,
-        required:true,
-        unique:true
-    },
     email :{
         type: String,
         required:true,
         unique:true
+    },
+    photo :{
+        type:String
     },
     bio:{
         type: String 
@@ -33,7 +31,11 @@ const userSchema = new mongoose.Schema({
     ideasPosted :{
         type: [mongoose.Schema.Types.ObjectId],
         ref :'Idea'
-    }
+    },
+    links:{
+        type: [String],
+        default:[]
+    },
 },{timestamps:true});
 
 

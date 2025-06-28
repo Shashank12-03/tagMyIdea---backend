@@ -8,7 +8,6 @@ export async function follow(req,res) {
         return res.status(400).json({'message':'follow id required'});
     }
     try {
-        console.log(req.user);
         
         const author = await req.user;
         const authorId = new mongoose.Types.ObjectId(author.id);
@@ -19,8 +18,6 @@ export async function follow(req,res) {
 
         const followerID = new mongoose.Types.ObjectId(followId);
 
-        console.log(authorId);
-        console.log(followerID);
 
         const follower = await User.findByIdAndUpdate(followerID,{$addToSet:{followers:authorId}},{new:true});
         const following = await User.findByIdAndUpdate(authorId,{$addToSet:{following:followerID}},{new:true});
@@ -75,52 +72,78 @@ export async function unfollow(req,res) {
     }
 }
 
+
+
 export async function getUser(req,res) {
-    const {userId} = req.query;
-    if (!userId) {
-        return res.status(400).json({'message':'url query required'});
+    const {id} = req.params;
+    if (!id) {
+        return res.status(400).json({"message":"user id required"})
     }
     try {
-        const user = await User.findById(userId);
-        console.log(user.bio);
-        const toShow = {
+        const user = await User.findById(id).select("username photo bio followers following links dateJoined email");
+        return res.status(200).json({"user":user});
+    } catch (error) {
+        return res.status(500).json({"Error occured":error.message});
+    }
+}
+
+export async function getLoggedUser(req,res) {
+    const user = await req.user;
+    const userId = user.id;
+    if (!userId) {
+        return res.status(400).json({"message":"user id required"})
+    }
+    try {
+        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email");
+        return res.status(200).json({"user":user});
+    } catch (error) {
+        return res.status(500).json({"Error occured":error.message});
+    }
+}
+
+export async function getList(req,res) {
+    const {list} = req.body;
+    if (!list) {
+        return res.status(400).json({"message":"no list found"});
+    }
+    try {
+        const listToReturn = await User.find({_id:{$in:list}}).select("username photo");
+        return res.status(200).json({"list":listToReturn});
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({"Error occured":error.message});
+    }
+}
+
+
+export async function updateUser(req,res) {
+    
+    const {username,bio, links} = req.body;
+    if (!username && !bio && !links){
+        return res.status(400).json({'message':'need something to update'});
+    }
+    try {
+        const userData = await req.user;
+        const userId = userData.id;
+        const user = await User.findByIdAndUpdate(userId, {
+            username: username,
+            bio: bio,
+            links: links
+        }, {new:true}).select("id username photo bio followers following links dateJoined email");
+        console.log(user);
+        const data = {
+            'id':user.id,
             'name': user.username,
             'bio':user.bio,
-            'NoOffollowers':user.followers.length,
+            'NoOffollowers':user.followers?.length,
             'NoOffollowing':user.following.length,
             'followers':user.followers,
             'following':user.following,
             'dateJoined': user.dateJoined,
-        };
-        if (!user) {
-            return res.status(400).json({'message':'user not found'});
+            'links':user.links,
+            'photo':user.photo,
         }
-        return res.status(200).json({'user':toShow});
-    } catch (error) {
-        console.log(error);
-        return res.status(400).json({'message':'something went wrong'});
-    }
-}
-
-export async function updateUser(req,res) {
-    
-    const {username,bio} = req.body;
-    if (!username && !bio){
-        return res.status(400).json({'message':'need something to update'});
-    }
-    try {
-        const getUser = await req.user;
-        var user;
-        if (username && !bio) {
-            user = await User.findByIdAndUpdate(getUser.id,{username},{new:true,runValidators:true});
-        }
-        else if (!username && bio) {
-            user = await User.findByIdAndUpdate(getUser.id,{bio},{new:true,runValidators:true});
-        }
-        else {
-            user = await User.findByIdAndUpdate(getUser.id,{username,bio},{new:true,runValidators:true});
-        }
-        return res.status(200).json({'user':user});
+        return res.status(200).json({'user':data});
     } catch (error) {
         console.log(error);
         return res.status(400).json({'message':'something went wrong'});
@@ -167,13 +190,53 @@ export async function getIdeas(req,res) {
     try {
         const userId = user.id;
         const author = await User.findById(userId);
-        const followingList = author.following; 
-        const feed = await Ideas.find({author:{$in:followingList}}).limit(20).sort({createdAt:-1});
+        const followingList = author.following;
+        // we have to get the ideas of the users that the logged in user is following 
+        // and ideas which are top rated and more viewed
+        // const feed = await Ideas.find({author:{$in:followingList}}).limit(20).sort({createdAt:-1});
         // feed.sort((a,b) => new Date (a.createdAt)- new Date (b.createdAt));
-        console.log(feed);
+        const feed = await Ideas.aggregate([
+            { $match: { 
+                    author: { $in: followingList },
+                    // createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+                }
+            },
+            { $sort: 
+                { createdAt: -1 } 
+            },
+            { 
+                $limit: 20 
+            },
+            {
+                $lookup:{
+                    from:'user',
+                    localField:'author',
+                    foreignField:'_id',
+                    as:'author'
+                }
+            },
+            {
+                $project:{
+                    _id:1,
+                    title:1,
+                    description:1,
+                    tags:1,
+                    techStack:1,
+                    howToBuild:1,
+                    upvotes:1,
+                    createdAt:1,
+                    userId: "$_id",
+                    username: author.username,
+                    photo: author.photo,
+                }
+            },
+        ]);
         return res.status(200).json({'feed':feed,'number':feed.length});
     } catch (error) {
         console.log(error);
         return res.status(400).json({'message':'something went wrong'});
     }
 }
+
+// we have to also maintain the ideas which are already being viewed by the user
+// so that we can show the user the ideas which are not viewed by him

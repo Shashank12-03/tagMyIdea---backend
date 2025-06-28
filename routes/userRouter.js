@@ -1,14 +1,16 @@
 import express from "express";
-import {follow,unfollow,getUser,updateUser,search,deleteUser,getIdeas} from "../controllers/user.js";
+import {follow,unfollow,getUser,updateUser,search,deleteUser,getIdeas,getList,getLoggedUser} from "../controllers/user.js";
 export const userRouter = express.Router();
 
 userRouter.post('/follow',follow);
 userRouter.post('/unfollow',unfollow);
-userRouter.get('/fetch-user',getUser);
-userRouter.post('/update',updateUser);
+userRouter.get('/fetch-user/:id',getUser);
+userRouter.get('/fetch-logged-user',getLoggedUser);
+userRouter.get('/fetch-list',getList);
 userRouter.get('/search',search);
-userRouter.delete('/delete',deleteUser);
 userRouter.get('/feed',getIdeas);
+userRouter.delete('/delete',deleteUser);
+userRouter.put('/update',updateUser);
 // # Operations
 
 // User 
