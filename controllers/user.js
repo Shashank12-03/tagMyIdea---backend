@@ -118,32 +118,30 @@ export async function getList(req,res) {
 
 export async function updateUser(req,res) {
     
-    const {username,bio} = req.body;
-    if (!username && !bio){
+    const {username,bio, links} = req.body;
+    if (!username && !bio && !links){
         return res.status(400).json({'message':'need something to update'});
     }
     try {
-        const getUser = await req.user;
-        console.log(getUser);
-        var user;
-        if (username && !bio) {
-            user = await User.findByIdAndUpdate(getUser.id,{username},{new:true,runValidators:true});
-        }
-        else if (!username && bio) {
-            user = await User.findByIdAndUpdate(getUser.id,{bio},{new:true,runValidators:true});
-        }
-        else {
-            user = await User.findByIdAndUpdate(getUser.id,{username,bio},{new:true,runValidators:true});
-        }
+        const userData = await req.user;
+        const userId = userData.id;
+        const user = await User.findByIdAndUpdate(userId, {
+            username: username,
+            bio: bio,
+            links: links
+        }, {new:true}).select("id username photo bio followers following links dateJoined email");
+        console.log(user);
         const data = {
             'id':user.id,
             'name': user.username,
             'bio':user.bio,
-            'NoOffollowers':user.followers.length,
+            'NoOffollowers':user.followers?.length,
             'NoOffollowing':user.following.length,
             'followers':user.followers,
             'following':user.following,
             'dateJoined': user.dateJoined,
+            'links':user.links,
+            'photo':user.photo,
         }
         return res.status(200).json({'user':data});
     } catch (error) {

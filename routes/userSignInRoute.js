@@ -25,7 +25,7 @@ userSignInRouter.get('/google',
       const token = req.user.token;
       const encodedToken = encodeURIComponent(token);
       console.log(encodedToken);
-      res.redirect(`${frontend_url}/update/profile?token=${encodedToken}`);
+      res.redirect(`${frontend_url}/profile?token=${encodedToken}`);
       // return res.status(200).json({
       //   message: 'Authentication successful',
       //   token: token,

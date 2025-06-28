@@ -10,7 +10,7 @@ userRouter.get('/fetch-list',getList);
 userRouter.get('/search',search);
 userRouter.get('/feed',getIdeas);
 userRouter.delete('/delete',deleteUser);
-userRouter.patch('/update',updateUser);
+userRouter.put('/update',updateUser);
 // # Operations
 
 // User 

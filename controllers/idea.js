@@ -3,7 +3,7 @@ import { User } from "../models/user.js";
 
 
 export async function createIdea(req,res) {
-    const {title, description, tags, techStack, howToBuild} = req.body;
+    const {title, description, tags, techStack, howToBuild} = req.body.idea;
     if (title && description && tags && techStack && howToBuild){
         const author = await req.user;
         if (!author?.id){
@@ -26,7 +26,7 @@ export async function createIdea(req,res) {
             
         } catch (error) {
             console.log(error);
-            return res.status(400).json({'message':'something went wrong!!!!'});
+            return res.status(500).json({'message':'something went wrong!!!!'});
         }
     }
     
