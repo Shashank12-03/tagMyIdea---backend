@@ -106,12 +106,15 @@ export async function getLoggedUser(req,res) {
 }
 
 export async function getList(req,res) {
-    const {list} = req.body;
+    const {list} = req.query;
+    // console.log(list);
     if (!list) {
         return res.status(400).json({"message":"no list found"});
     }
+    let parsedList;
     try {
-        const listToReturn = await User.find({_id:{$in:list}}).select("username photo");
+        parsedList = JSON.parse(list);
+        const listToReturn = await User.find({_id:{$in:parsedList}}).select("id username photo");
         return res.status(200).json({"list":listToReturn});
     } catch (error) {
         console.log(error.message);
