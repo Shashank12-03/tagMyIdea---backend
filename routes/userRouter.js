@@ -4,7 +4,7 @@ export const userRouter = express.Router();
 
 userRouter.post('/follow',follow);
 userRouter.post('/unfollow',unfollow);
-userRouter.get('/fetch-user/:id',getUser);
+userRouter.get('/fetch-user/:userId',getUser);
 userRouter.get('/fetch-logged-user',getLoggedUser);
 userRouter.get('/fetch-list',getList);
 userRouter.get('/search',search);

@@ -13,9 +13,12 @@ import cors from 'cors';
 
 if (process.env.NODE_ENV !== 'production') {
   import('dotenv').then(dotenv => dotenv.config());
+  console.log("Development mode: Environment variables loaded.");
 }
+// dotenv.config()
 
 const url = process.env.DATABASE_URL;
+
 connect(url)
 .then(()=>console.log("mongodb connected"))
 .catch((err)=> console.log("error occured: \n",err));

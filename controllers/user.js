@@ -75,12 +75,16 @@ export async function unfollow(req,res) {
 
 
 export async function getUser(req,res) {
-    const {id} = req.params;
-    if (!id) {
+    const {userId} = req.params;
+    console.log(userId);
+    if (!userId) {
         return res.status(400).json({"message":"user id required"})
     }
     try {
-        const user = await User.findById(id).select("username photo bio followers following links dateJoined email");
+        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email");
+        if (!user) {
+            return res.status(404).json({"message":"user not found"});
+        }
         return res.status(200).json({"user":user});
     } catch (error) {
         return res.status(500).json({"Error occured":error.message});
@@ -102,12 +106,15 @@ export async function getLoggedUser(req,res) {
 }
 
 export async function getList(req,res) {
-    const {list} = req.body;
+    const {list} = req.query;
+    // console.log(list);
     if (!list) {
         return res.status(400).json({"message":"no list found"});
     }
+    let parsedList;
     try {
-        const listToReturn = await User.find({_id:{$in:list}}).select("username photo");
+        parsedList = JSON.parse(list);
+        const listToReturn = await User.find({_id:{$in:parsedList}}).select("id username photo");
         return res.status(200).json({"list":listToReturn});
     } catch (error) {
         console.log(error.message);
@@ -225,7 +232,7 @@ export async function getIdeas(req,res) {
                     howToBuild:1,
                     upvotes:1,
                     createdAt:1,
-                    userId: "$_id",
+                    userId: author._id,
                     username: author.username,
                     photo: author.photo,
                 }
