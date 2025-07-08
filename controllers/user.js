@@ -1,6 +1,8 @@
 import { User } from "../models/user.js";
 import { Ideas } from "../models/ideas.js";
 import mongoose from "mongoose";
+import { agenda } from "../services/agenda.js";
+import { Feed } from "../models/feed.js";
 
 export async function follow(req,res) {
     const {followId} = req.body;
@@ -99,9 +101,35 @@ export async function getLoggedUser(req,res) {
     }
     try {
         const user = await User.findById(userId).select("username photo bio followers following links dateJoined email");
+        
+        // Schedule feed building job
+        console.log(`Scheduling feed build job for user: ${userId}`);
+        await agenda.schedule('in 1 minute', 'build-user-feed', { userId: userId });
+        console.log(`Feed build job scheduled for user: ${userId}`);
+        
         return res.status(200).json({"user":user});
     } catch (error) {
+        console.error("Error in getLoggedUser:", error);
         return res.status(500).json({"Error occured":error.message});
+    }
+}
+
+export async function triggerFeedBuild(req, res) {
+    const user = await req.user;
+    const userId = user.id;
+    
+    try {
+        console.log(`Manually triggering feed build for user: ${userId}`);
+        await agenda.now('build-user-feed', { userId: userId });
+        console.log(`Feed build job triggered immediately for user: ${userId}`);
+        
+        return res.status(200).json({
+            "message": "Feed build triggered successfully",
+            "userId": userId
+        });
+    } catch (error) {
+        console.error("Error triggering feed build:", error);
+        return res.status(500).json({"Error occurred": error.message});
     }
 }
 
@@ -136,8 +164,8 @@ export async function updateUser(req,res) {
             username: username,
             bio: bio,
             links: links
-        }, {new:true}).select("id username photo bio followers following links dateJoined email");
-        console.log(user);
+        }, {new:true});
+        // console.log(user);
         const data = {
             'id':user.id,
             'name': user.username,
@@ -153,7 +181,7 @@ export async function updateUser(req,res) {
         return res.status(200).json({'user':data});
     } catch (error) {
         console.log(error);
-        return res.status(400).json({'message':'something went wrong'});
+        return res.status(500).json({'error':error.message});
     }
 }
 
@@ -202,48 +230,138 @@ export async function getIdeas(req,res) {
         // and ideas which are top rated and more viewed
         // const feed = await Ideas.find({author:{$in:followingList}}).limit(20).sort({createdAt:-1});
         // feed.sort((a,b) => new Date (a.createdAt)- new Date (b.createdAt));
-        const feed = await Ideas.aggregate([
-            { $match: { 
-                    author: { $in: followingList },
-                    // createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
-                }
-            },
-            { $sort: 
-                { createdAt: -1 } 
-            },
-            { 
-                $limit: 20 
-            },
-            {
-                $lookup:{
-                    from:'user',
-                    localField:'author',
-                    foreignField:'_id',
-                    as:'author'
-                }
-            },
-            {
-                $project:{
-                    _id:1,
-                    title:1,
-                    description:1,
-                    tags:1,
-                    techStack:1,
-                    howToBuild:1,
-                    upvotes:1,
-                    createdAt:1,
-                    userId: author._id,
-                    username: author.username,
-                    photo: author.photo,
-                }
-            },
-        ]);
+        // const feed = await Ideas.aggregate([
+        //     { $match: { 
+        //             author: { $in: followingList },
+        //             // createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+        //         }
+        //     },
+        //     { $sort: 
+        //         { createdAt: -1 } 
+        //     },
+        //     { 
+        //         $limit: 20 
+        //     },
+        //     {
+        //         $lookup:{
+        //             from:'user',
+        //             localField:'author',
+        //             foreignField:'_id',
+        //             as:'author'
+        //         }
+        //     },
+        //     {
+        //         $project:{
+        //             _id:1,
+        //             title:1,
+        //             description:1,
+        //             tags:1,
+        //             techStack:1,
+        //             howToBuild:1,
+        //             upvotes:1,
+        //             createdAt:1,
+        //             userId: author._id,
+        //             username: author.username,
+        //             photo: author.photo,
+        //         }
+        //     },
+        // ]);
+        const feed = await Feed.findOne({user:userId}).populate('ideas');
+        console.log(feed);
         return res.status(200).json({'feed':feed,'number':feed.length});
     } catch (error) {
         console.log(error);
-        return res.status(400).json({'message':'something went wrong'});
+        return res.status(500).json({'message':error.message});
     }
 }
 
 // we have to also maintain the ideas which are already being viewed by the user
 // so that we can show the user the ideas which are not viewed by him
+
+
+export async function debugJobs(req, res) {
+    try {
+        const jobs = await agenda.jobs();
+        const jobsInfo = jobs.map(job => ({
+            name: job.attrs.name,
+            data: job.attrs.data,
+            nextRunAt: job.attrs.nextRunAt,
+            lastRunAt: job.attrs.lastRunAt,
+            lastFinishedAt: job.attrs.lastFinishedAt,
+            failedAt: job.attrs.failedAt,
+            failReason: job.attrs.failReason,
+            result: job.attrs.result
+        }));
+        
+        res.status(200).json({
+            totalJobs: jobs.length,
+            jobs: jobsInfo
+        });
+    } catch (error) {
+        console.error("Error fetching jobs:", error);
+        res.status(500).json({"Error occurred": error.message});
+    }
+}
+
+export async function testJob(req, res) {
+    const user = await req.user;
+    const userId = user.id;
+    
+    try {
+        // Schedule a job to run immediately
+        await agenda.now('build-user-feed', { userId: userId });
+        
+        res.status(200).json({
+            "message": "Test job scheduled to run immediately",
+            "userId": userId
+        });
+    } catch (error) {
+        console.error("Error scheduling test job:", error);
+        res.status(500).json({"Error occurred": error.message});
+    }
+}
+
+export async function updatesaveIdeas(req,res) {
+    const {ideaId,save} = req.body;
+    if (!ideaId) {
+        return res.status(400).json({'message':'idea id required'});
+    }
+    const user = await req.user;
+    const userId = user.id;
+    try {
+        if (save) {
+            const updateUser = await User.findByIdAndUpdate(userId,{$addToSet:{savedIdeas:ideaId}},{new:true});
+            return res.status(200).json({'message':'idea saved'});
+        }
+        else{
+            const updateUser = await User.findByIdAndUpdate(userId,{$pull:{savedIdeas:ideaId}});
+            return res.status(200).json({'message':'idea removed from saved idea'});
+        }
+    } catch (error) {
+        console.error("Error scheduling test job:", error);
+        res.status(500).json({"Error occurred": error.message});
+    }
+}
+
+export async function getSaveIdeas(req,res) {
+    const user = await req.user;
+    const userId = user.id;
+    try {
+        const savedIdeas = await User.findById(userId).populate('savedIdeas').select('savedIdeas');
+        res.status(200).json({'saveIdeas':savedIdeas});
+    } catch (error) {
+        console.error("Error getting save ideas: ", error);
+        res.status(500).json({"Error occurred": error.message});
+    }
+}
+
+export async function getUserIdeas(req,res) {
+    const {userId} = req.params;
+    try {
+        const userIdeas = await User.findById(userId).populate('ideasPosted').select('ideasPosted');
+        res.status(200).json({'userIdeas':userIdeas});
+    } catch (error) {
+        console.error("Error getting user ideas: ", error);
+        res.status(500).json({"Error occurred": error.message});
+    }
+}
