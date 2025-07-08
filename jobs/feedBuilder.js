@@ -23,7 +23,7 @@ export function defineFeedBuilder(agenda) {
         console.log(`[FEED JOB] Found ${ideas.length} ideas from following`);
       } else {
         console.log(`[FEED JOB] No following users, getting popular ideas...`);
-        ideas = await Ideas.find({}).sort({ upvotes: -1}).limit(50);
+        ideas = await Ideas.find({}).sort({ upvotes: 1}).limit(50);
         console.log(`[FEED JOB] Found ${ideas.length} popular ideas`);
       }
 

@@ -83,7 +83,7 @@ export async function getUser(req,res) {
         return res.status(400).json({"message":"user id required"})
     }
     try {
-        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email");
+        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email ideasPosted").populate('ideasPosted');
         if (!user) {
             return res.status(404).json({"message":"user not found"});
         }
@@ -100,12 +100,7 @@ export async function getLoggedUser(req,res) {
         return res.status(400).json({"message":"user id required"})
     }
     try {
-        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email");
-        
-        // Schedule feed building job
-        console.log(`Scheduling feed build job for user: ${userId}`);
-        await agenda.schedule('in 1 minute', 'build-user-feed', { userId: userId });
-        console.log(`Feed build job scheduled for user: ${userId}`);
+        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email ideasPosted").populate('ideasPosted');
         
         return res.status(200).json({"user":user});
     } catch (error) {
@@ -266,8 +261,7 @@ export async function getIdeas(req,res) {
         //         }
         //     },
         // ]);
-        const feed = await Feed.findOne({user:userId}).populate('ideas').select('ideas');
-        console.log(feed);
+        const feed = await Feed.findOne({user:userId}).populate('ideas user').select('ideas username photo');
         return res.status(200).json({'feed':feed,'number':feed.length});
     } catch (error) {
         console.log(error);
@@ -355,13 +349,3 @@ export async function getSaveIdeas(req,res) {
     }
 }
 
-export async function getUserIdeas(req,res) {
-    const {userId} = req.params;
-    try {
-        const userIdeas = await User.findById(userId).populate('ideasPosted').select('ideasPosted');
-        res.status(200).json({'userIdeas':userIdeas});
-    } catch (error) {
-        console.error("Error getting user ideas: ", error);
-        res.status(500).json({"Error occurred": error.message});
-    }
-}

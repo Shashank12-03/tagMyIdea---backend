@@ -1,5 +1,5 @@
 import express from "express";
-import {follow,unfollow,getUser,updateUser,search,deleteUser,getIdeas,getList,getLoggedUser,debugJobs,testJob,getSaveIdeas,getUserIdeas,updatesaveIdeas} from "../controllers/user.js";
+import {follow,unfollow,getUser,updateUser,search,deleteUser,getIdeas,getList,getLoggedUser,debugJobs,testJob,getSaveIdeas,updatesaveIdeas} from "../controllers/user.js";
 export const userRouter = express.Router();
 
 userRouter.post('/follow',follow);
@@ -14,8 +14,7 @@ userRouter.put('/update',updateUser);
 userRouter.get('/debug-jobs',debugJobs);
 userRouter.post('/test-jobs',testJob);
 userRouter.put('/update-saved-ideas',updatesaveIdeas);
-userRouter.get('/get-save-ideas/:userId',getSaveIdeas);
-userRouter.get('/get-user-ideas/:userId',getUserIdeas);
+userRouter.get('/get-saved-ideas/:userId',getSaveIdeas);
 
 // # Operations
 
