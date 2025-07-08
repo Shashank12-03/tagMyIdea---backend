@@ -266,7 +266,7 @@ export async function getIdeas(req,res) {
         //         }
         //     },
         // ]);
-        const feed = await Feed.findOne({user:userId}).populate('ideas');
+        const feed = await Feed.findOne({user:userId}).populate('ideas').select('ideas');
         console.log(feed);
         return res.status(200).json({'feed':feed,'number':feed.length});
     } catch (error) {

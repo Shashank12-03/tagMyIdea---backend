@@ -3,7 +3,7 @@ import passport from "passport";
 
 export const userSignInRouter = express.Router();
 
-const frontend_url = "http://localhost:5173"
+const frontend_url = "https://tagmyidea.vercel.app"
 
 
 userSignInRouter.get('/google', 
