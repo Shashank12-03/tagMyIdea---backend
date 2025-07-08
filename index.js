@@ -26,9 +26,9 @@ const PORT = process.env.PORT;
 const app = express();
 
 const coreOption = {
-    origin:["http://localhost:5173","https://tagmyidea.vercel.app/"],
-    method:["GET","POST","PATCH","DELETE","PUT"],
-    allowHeaders:["Content-Type","Authorization","Access-Control-Allow-Origin"],
+    origin: ["http://localhost:5173", "https://tagmyidea.vercel.app"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
     credentials: true, 
 }
 
