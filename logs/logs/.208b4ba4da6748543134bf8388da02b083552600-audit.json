@@ -6,11 +6,6 @@
     "auditLog": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\.208b4ba4da6748543134bf8388da02b083552600-audit.json",
     "files": [
         {
-            "date": 1750774323991,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-06-24-error.log",
-            "hash": "e88ccd060364b75b83cbb41cfd4d809f64e3e28d43d73e41e13baea6acddf260"
-        },
-        {
             "date": 1750942482789,
             "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-06-26-error.log",
             "hash": "809846bcb3034f51fa80fca9e37820b298aafb62b99337e6c6390ab2708e75a3"
@@ -44,6 +39,11 @@
             "date": 1751968851094,
             "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-08-error.log",
             "hash": "284318d4042e46babcb32f2aed7bab3cc58722d4a843e7b0797e58e7470703d7"
+        },
+        {
+            "date": 1752068269644,
+            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-09-error.log",
+            "hash": "842784688f9d002efbd965561a249dd9702a847168eefc1de36622baea5fddf3"
         }
     ],
     "hashType": "sha256"

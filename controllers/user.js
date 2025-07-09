@@ -269,31 +269,34 @@ export async function getIdeas(req,res) {
     }
 }
 
-// we have to also maintain the ideas which are already being viewed by the user
-// so that we can show the user the ideas which are not viewed by him
 
-
-export async function debugJobs(req, res) {
+export async function getFeedStatus(req, res) {
+    const user = await req.user;
+    const userId = user.id;
+    
     try {
-        const jobs = await agenda.jobs();
-        const jobsInfo = jobs.map(job => ({
-            name: job.attrs.name,
-            data: job.attrs.data,
-            nextRunAt: job.attrs.nextRunAt,
-            lastRunAt: job.attrs.lastRunAt,
-            lastFinishedAt: job.attrs.lastFinishedAt,
-            failedAt: job.attrs.failedAt,
-            failReason: job.attrs.failReason,
-            result: job.attrs.result
-        }));
+
+        const activeJobs = await agenda.jobs({
+            'name': 'build-user-feed',
+            'data.userId': userId,
+            'nextRunAt': { $exists: true },
+            'lockedAt': { $exists: true }
+        });
         
-        res.status(200).json({
-            totalJobs: jobs.length,
-            jobs: jobsInfo
+        console.log(`Active jobs for user ${userId}:`, activeJobs.length);
+        const isBuilding = activeJobs.length > 0;
+        
+        const feed = await Feed.findOne({ user: userId }).populate('ideas');
+        
+        return res.status(200).json({
+            "isBuilding": isBuilding,
+            "feed": feed,
+            "feedCount": feed ? feed.ideas.length : 0,
+            "lastUpdated": feed ? feed.updatedAt : null
         });
     } catch (error) {
-        console.error("Error fetching jobs:", error);
-        res.status(500).json({"Error occurred": error.message});
+        console.error("Error checking feed status:", error);
+        return res.status(500).json({"Error occurred": error.message});
     }
 }
 
@@ -302,12 +305,19 @@ export async function testJob(req, res) {
     const userId = user.id;
     
     try {
-        // Schedule a job to run immediately
+        const feed = await Feed.findOne({user:userId});
+        const lastUpdated = feed.updatedAt;
+        const now = new Date();
+        if (feed && now - new Date(lastUpdated) < 3*60*60*1000) {
+            return res.status(200).json({'message':`abhi to update kiya tha ${(now - new Date(lastUpdated))/1000}s pehle`});
+        }
+
         await agenda.now('build-user-feed', { userId: userId });
         
-        res.status(200).json({
-            "message": "Test job scheduled to run immediately",
-            "userId": userId
+        return res.status(200).json({
+            "message": "Feed build started",
+            "userId": userId,
+            "status": "building"
         });
     } catch (error) {
         console.error("Error scheduling test job:", error);

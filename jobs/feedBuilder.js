@@ -57,4 +57,20 @@ export function defineFeedBuilder(agenda) {
       throw err; // Re-throw to mark job as failed
     }
   });
+
+  agenda.on('ready', async () => {
+    setInterval(async () => {
+      try {
+        const result = await agenda._collection.deleteMany({
+          name: 'build-user-feed',
+          lastFinishedAt: { $exists: true },
+        });
+        if (result.deleteCount > 0) {
+          console.log(`[FEED JOB] Cleaned up ${result.deleteCount} completed feed jobs.`);
+        }
+      } catch (error) {
+        console.error(`[FEED JOB] Error cleaning up completed job:`, error.message);
+      }
+    }, 60*60*1000);
+  })
 }

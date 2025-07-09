@@ -20,9 +20,6 @@ const agenda = new Agenda({
   defaultLockLifetime: 10 * 60 * 1000, 
 });
 
-agenda.on('ready', () => {
-  console.log('Agenda ready and connected to MongoDB!');
-});
 
 agenda.on('start',
    job => {
