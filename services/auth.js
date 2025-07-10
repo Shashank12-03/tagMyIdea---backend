@@ -3,8 +3,16 @@ import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET;
 
 export async function getUser(token) {
-    if (!token) {
+    try {
+        if (!token) {
+            return null;
+        }
+        const res = jwt.verify(token,secret);
+        return res;
+    } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+            return 'expired';
+        }
         return null;
     }
-    return jwt.verify(token,secret);
 }

@@ -1,17 +1,25 @@
 import { getUser } from "../services/auth.js";
 
 export async function checkAuthentication(req,res,next) {
-    const token = req.headers.authorization?.split(' ')[1];
-    req.user = null;
-    if (!token) {
-        return res.status(401).json({'message':'token required'});
-    }  
-    const user = getUser(token);
-    if (!user) {
-        return res.status(401).json({'message':'user not found'})
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        req.user = null;
+        if (!token) {
+            return res.status(401).json({'message':'token required'});
+        }  
+        const user = await getUser(token);
+        if (user==='expired') {
+            console.log("Token expired");
+            return res.status(401).json({'message':'token expired relogin'})
+        }
+        if (!user) {
+            return res.status(401).json({'message':'invalid token'});
+        }
+        req.user = user;
+        next();
+    } catch (error) {
+        return res.status(500).json({'message':'Internal server error'});
     }
-    req.user = user;
-    next();
 }
 
 // export async function restrictTo(req,res,next) {
