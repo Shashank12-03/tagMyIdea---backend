@@ -100,8 +100,7 @@ export async function getLoggedUser(req,res) {
         return res.status(400).json({"message":"user id required"})
     }
     try {
-        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email ideasPosted").populate('ideasPosted');
-        
+        const user = await User.findById(userId).select("username photo bio followers following links dateJoined email ideasPosted savedIdeas").populate('ideasPosted savedIdeas');
         return res.status(200).json({"user":user});
     } catch (error) {
         console.error("Error in getLoggedUser:", error);
@@ -262,6 +261,9 @@ export async function getIdeas(req,res) {
         //     },
         // ]);
         const feed = await Feed.findOne({user:userId}).populate('ideas user').select('ideas username photo');
+        if (!feed) {
+            return res.status(404).json({'message':'feed not found'});
+        }
         return res.status(200).json({'feed':feed,'number':feed.length});
     } catch (error) {
         console.log(error);
@@ -306,10 +308,9 @@ export async function testJob(req, res) {
     
     try {
         const feed = await Feed.findOne({user:userId});
-        const lastUpdated = feed.updatedAt;
         const now = new Date();
-        if (feed && now - new Date(lastUpdated) < 3*60*60*1000) {
-            return res.status(200).json({'message':`abhi to update kiya tha ${(now - new Date(lastUpdated))/1000}s pehle`});
+        if (feed && now - new Date(feed.updatedAt) < 3*60*60*1000) {
+            return res.status(200).json({'message':`abhi to update kiya tha ${(now - new Date(feed.updatedAt))/1000}s pehle`});
         }
 
         await agenda.now('build-user-feed', { userId: userId });

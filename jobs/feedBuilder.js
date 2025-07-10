@@ -19,11 +19,11 @@ export function defineFeedBuilder(agenda) {
       let ideas;
       if (user.following && user.following.length > 0) {
         console.log(`[FEED JOB] Finding ideas from following list...`);
-        ideas = await Ideas.find({ author: { $in: user.following } }).limit(50);
+        ideas = await Ideas.find({ author: { $in: user.following } }).sort({ upvotes: -1}).limit(50);
         console.log(`[FEED JOB] Found ${ideas.length} ideas from following`);
       } else {
         console.log(`[FEED JOB] No following users, getting popular ideas...`);
-        ideas = await Ideas.find({}).sort({ upvotes: 1}).limit(50);
+        ideas = await Ideas.find({}).sort({ upvotes: -1}).limit(50);
         console.log(`[FEED JOB] Found ${ideas.length} popular ideas`);
       }
 
