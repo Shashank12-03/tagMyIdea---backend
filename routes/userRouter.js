@@ -1,5 +1,5 @@
 import express from "express";
-import {follow,unfollow,getUser,updateUser,search,deleteUser,getIdeas,getList,getLoggedUser} from "../controllers/user.js";
+import {follow,unfollow,getUser,updateUser,search,deleteUser,getIdeas,getList,getLoggedUser,getFeedStatus,testJob,getSaveIdeas,updatesaveIdeas} from "../controllers/user.js";
 export const userRouter = express.Router();
 
 userRouter.post('/follow',follow);
@@ -11,6 +11,11 @@ userRouter.get('/search',search);
 userRouter.get('/feed',getIdeas);
 userRouter.delete('/delete',deleteUser);
 userRouter.put('/update',updateUser);
+userRouter.get('/debug-jobs',getFeedStatus);
+userRouter.post('/test-jobs',testJob);
+userRouter.put('/update-saved-ideas',updatesaveIdeas);
+userRouter.get('/get-saved-ideas/:userId',getSaveIdeas);
+
 // # Operations
 
 // User 

@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
         type: [String],
         default:[]
     },
+    savedIdeas:{
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Idea'
+    },
 },{timestamps:true});
 
 
