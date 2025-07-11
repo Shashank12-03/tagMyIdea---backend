@@ -260,7 +260,14 @@ export async function getIdeas(req,res) {
         //         }
         //     },
         // ]);
-        const feed = await Feed.findOne({user:userId}).populate('ideas user').select('ideas username photo');
+
+        const feed = await Feed.findOne({user:userId}).populate({
+            path:'ideas',
+            populate:{
+                path:'author',
+                select:'id username photo'
+            }
+        }).select('ideas');
         if (!feed) {
             return res.status(404).json({'message':'feed not found'});
         }
