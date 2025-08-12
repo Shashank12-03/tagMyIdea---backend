@@ -11,7 +11,7 @@ const clientSecret=process.env.CLIENT_SECRET;
 passport.use(new GoogleStrategy({
     clientID:clientID,
     clientSecret:clientSecret,
-    callbackURL:'https://tagmyidea.el.r.appspot.com/auth/google/callback'
+    callbackURL:'https://tagmyidea-backend.onrender.com/auth/google/callback'
     },
     async (accessToken,refreshTokenn,profile,done) => {
         try {
