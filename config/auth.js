@@ -27,7 +27,7 @@ passport.use(new GoogleStrategy({
                 await user.save();
             }
 
-            const token = jwt.sign({id:user._id,email:user.email},process.env.JWT_SECRET,{expiresIn:'7d'});
+            const token = jwt.sign({id:user._id,email:user.email, isAdmin:false},process.env.JWT_SECRET,{expiresIn:'7d'});
             console.log(token);
             done(null,{user,token});
         } catch (error) {

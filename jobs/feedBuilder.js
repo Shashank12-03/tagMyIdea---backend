@@ -16,11 +16,24 @@ export function defineFeedBuilder(agenda) {
 
       console.log(`[FEED JOB] Found user: ${user.username}, following: ${user.following?.length || 0} users`);
 
-      let ideas;
+      let ideas = [];
       if (user.following && user.following.length > 0) {
         console.log(`[FEED JOB] Finding ideas from following list...`);
-        ideas = await Ideas.find({ author: { $in: user.following } }).sort({ upvotes: -1}).limit(50);
+        const followingIdeas = await Ideas.find({ $or: { author: { $in: user.following },  }}).sort({ upvotes: -1}).limit(20);
         console.log(`[FEED JOB] Found ${ideas.length} ideas from following`);
+
+        console.log(`[FEED JOB] Finding top voted ideas`);
+        const topIdeas = await Ideas.find({}).sort({ upvotes: -1 }).limit(10);
+        console.log(`[FEED JOB] Found ${ideas.length} top voted ideas`);
+        
+
+        const ideaMap = new Map();
+        [...followingIdeas, ...topIdeas].forEach(idea => {
+          ideaMap.set(idea._id.toString(), idea);
+        });
+        ideas = Array.from(ideaMap.values()).slice(0, 50);
+        console.log(`[FEED JOB] Combined feed has ${ideas.length} unique ideas.`);
+        
       } else {
         console.log(`[FEED JOB] No following users, getting popular ideas...`);
         ideas = await Ideas.find({}).sort({ upvotes: -1}).limit(50);
