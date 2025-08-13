@@ -6,44 +6,9 @@
     "auditLog": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\.359fa051aa424a91b8408fb4e720455cfa0bf44b-audit.json",
     "files": [
         {
-            "date": 1751095663664,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-06-28-combined.log",
-            "hash": "fe3b74448c29ddb1b3b59db532b5ac0c4ceb55798aaec9b8a902596fdfb4f6d4"
-        },
-        {
-            "date": 1751449566612,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-02-combined.log",
-            "hash": "1290743fa4f24b22af0920af01f52bb93929141a4bf15d06e6648f9a535dfdc1"
-        },
-        {
-            "date": 1751816883292,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-06-combined.log",
-            "hash": "6b552ae640655a84ca3ddb74df04b3b50f9709b93f3fa387c09456b2bf52b244"
-        },
-        {
-            "date": 1751895148507,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-07-combined.log",
-            "hash": "f32cac0a01ceab6fb7382a5ce8c6ec4207bacf6b1d5be46ec45238ac772cc75b"
-        },
-        {
-            "date": 1751968851040,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-08-combined.log",
-            "hash": "d2c2f0f5a229a2d7f3481c31d544156272b4a5264f2cf93b23dafda52b9dfc32"
-        },
-        {
-            "date": 1752068269592,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-09-combined.log",
-            "hash": "26de2c03d191dd5024b74d7f21d3dec5e199d60178f01e0bf02f63f5296bc0d6"
-        },
-        {
-            "date": 1752104868338,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-10-combined.log",
-            "hash": "10d0b3dda7b7e092b9996e1d00d722b734fe7e78bf979ac1b574fdba9395f86c"
-        },
-        {
-            "date": 1752235241168,
-            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-07-11-combined.log",
-            "hash": "91fa8736694a8fb463fb83c0e42161b0bcd096a2ce0822d2304722dcbccc417c"
+            "date": 1755065035735,
+            "name": "D:\\shashank\\javascript\\node\\TagMyIdea\\logs\\logs\\2025-08-13-combined.log",
+            "hash": "e14f9127926497bad71cd2210abf0ad58715e321875d59d604e239c4eb2ad5bf"
         }
     ],
     "hashType": "sha256"

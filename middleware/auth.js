@@ -22,6 +22,14 @@ export async function checkAuthentication(req,res,next) {
     }
 }
 
-// export async function restrictTo(req,res,next) {
-    
-// }
+export async function restrictToNonAdmin(req,res,next) {
+    try {
+        const user = await req.user;
+        if (!user.isAdmin) {
+            return res.status(401).json({'message':'not admin'});
+        }
+        next();
+    } catch (error) {
+        return res.status(500).json({'message':'Internal server error'});
+    }
+}

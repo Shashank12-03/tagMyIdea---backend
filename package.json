@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "startdev": "nodemon --env-file=.env index.js",
     "test": "jest --detectOpenHandles --forceExit"
   },
   "type": "module",

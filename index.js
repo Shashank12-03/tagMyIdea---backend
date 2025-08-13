@@ -4,12 +4,13 @@ import passport from "passport";
 import { userSignInRouter } from "./routes/userSignInRoute.js";
 import { userRouter } from "./routes/userRouter.js";
 import './config/auth.js';
-import { checkAuthentication } from "./middleware/auth.js";
+import { checkAuthentication, restrictToNonAdmin } from "./middleware/auth.js";
 import { ideaRouter } from "./routes/ideaRoute.js";
 import { errorLogRequests, logRequests } from "./middleware/log.js";
 import cors from 'cors';
 import { agenda } from "./services/agenda.js";
 import { defineFeedBuilder } from "./jobs/feedBuilder.js";
+import { analyticsRouter } from "./routes/analytics.js";
 
 if (process.env.NODE_ENV !== 'production') {
   import('dotenv').then(dotenv => dotenv.config());
@@ -43,7 +44,8 @@ app.use(errorLogRequests);
 app.use('/auth',userSignInRouter);
 app.use('/user',checkAuthentication,userRouter);
 app.use('/idea',checkAuthentication,ideaRouter);
-
+app.use('/analytics',analyticsRouter);
+app.use('/system',restrictToNonAdmin ,analyticsRouter);
 // Define jobs before starting agenda
 defineFeedBuilder(agenda);
 
