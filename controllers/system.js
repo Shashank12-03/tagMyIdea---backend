@@ -1,5 +1,5 @@
-import { Feed } from "../models/feed";
-
+import { Feed } from "../models/feed.js";
+import { agenda } from "../services/agenda.js";
 
 export async function getFeedStatus(req, res) {
     const user = await req.user;
@@ -33,6 +33,7 @@ export async function getFeedStatus(req, res) {
 
 export async function testJob(req, res) {
     const user = await req.user;
+    console.log("Test job initiated for user:", user);
     const userId = user.id;
     
     try {

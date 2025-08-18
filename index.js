@@ -11,6 +11,7 @@ import cors from 'cors';
 import { agenda } from "./services/agenda.js";
 import { defineFeedBuilder } from "./jobs/feedBuilder.js";
 import { analyticsRouter } from "./routes/analytics.js";
+import { systemRouter } from "./routes/system.js";
 
 if (process.env.NODE_ENV !== 'production') {
   import('dotenv').then(dotenv => dotenv.config());
@@ -45,7 +46,7 @@ app.use('/auth',userSignInRouter);
 app.use('/user',checkAuthentication,userRouter);
 app.use('/idea',checkAuthentication,ideaRouter);
 app.use('/analytics',analyticsRouter);
-app.use('/system',restrictToNonAdmin ,analyticsRouter);
+app.use('/system',checkAuthentication,systemRouter);
 // Define jobs before starting agenda
 defineFeedBuilder(agenda);
 
