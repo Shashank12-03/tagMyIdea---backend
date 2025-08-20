@@ -195,7 +195,7 @@ export async function search(req,res) {
                 ]
             };
             // console.log(searchResult);
-            result = await User.find(searchResult);
+            result = await User.find(searchResult).select('id username photo').limit(10);
         }
         else{
             const searchResult = {
@@ -207,7 +207,7 @@ export async function search(req,res) {
                 ]
             }
             // console.log(searchResult);
-            result = await Ideas.find(searchResult);
+            result = await Ideas.find(searchResult).populate({path:'author',select:'id username photo'});
         }
         res.status(200).json({'searchResult':result});
     } catch (error) {
