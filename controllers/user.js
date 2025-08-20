@@ -181,10 +181,11 @@ export async function updateUser(req,res) {
 
 export async function search(req,res) {
     const {searchString, user} = req.query;
-    console.log(user, typeof(user));
     if (!searchString) {
         return res.status(400).json({'message':'need something to search'});
     }
+    // const rawSearchString = '^'+searchString+'$';
+    // console.log(rawSearchString);
     try {
         let result;
         if(user==='1'){
@@ -193,7 +194,7 @@ export async function search(req,res) {
                     {username:{$regex:searchString,$options:'i'}}
                 ]
             };
-            console.log(searchResult);
+            // console.log(searchResult);
             result = await User.find(searchResult);
         }
         else{
@@ -201,14 +202,14 @@ export async function search(req,res) {
                 $or:[
                     {title:{$regex:searchString,$options:'i'}},
                     {description:{$regex:searchString,$options:'i'}},
-                    {techStack:{$regex:searchString}},
+                    {techStack:{$regex:searchString, $options: "i"}},
                     // {author:{$regex:searchString,$options:'i'}},
                 ]
             }
-            console.log(searchResult);
+            // console.log(searchResult);
             result = await Ideas.find(searchResult);
         }
-        res.status(200).json({'search-result':result});
+        res.status(200).json({'searchResult':result});
     } catch (error) {
         console.log(error);
         return res.status(500).json({'error':error.message});
